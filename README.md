@@ -1,6 +1,6 @@
-####Systemd
+#### Systemd
 
-####Usage
+#### Usage
 
 - start_unit(unit_name, mode="replace"), returns bool
 - stop_unit(unit_name, mode="replace"), returns bool
@@ -8,7 +8,7 @@
 - disable_unit(unit_name), returns bool
 - is_active(unit_name), returns bool
 
-####Example
+#### Example
 
 ```
 from sysdmanager import SystemdManager
