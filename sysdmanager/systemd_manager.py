@@ -60,8 +60,9 @@ class SystemdManager(object):
             return False
 
         try:
-            interface.EnableUnitFiles([unit_name], 
-                dbus.Boolean(False), dbus.Boolean(True))
+            interface.EnableUnitFiles([unit_name],
+                                      dbus.Boolean(False),
+                                      dbus.Boolean(True))
             return True
         except dbus.exceptions.DBusException as error:
             print(error)
@@ -74,8 +75,7 @@ class SystemdManager(object):
             return False
 
         try:
-            interface.DisableUnitFiles([unit_name], 
-                dbus.Boolean(False))
+            interface.DisableUnitFiles([unit_name], dbus.Boolean(False))
             return True
         except dbus.exceptions.DBusException as error:
             print(error)
@@ -84,9 +84,8 @@ class SystemdManager(object):
     def _get_interface(self):
         try:
             obj = self.__bus.get_object("org.freedesktop.systemd1",
-                "/org/freedesktop/systemd1")
-            return dbus.Interface(obj,
-                "org.freedesktop.systemd1.Manager")
+                                        "/org/freedesktop/systemd1")
+            return dbus.Interface(obj, "org.freedesktop.systemd1.Manager")
         except dbus.exceptions.DBusException as error:
             print(error)
             return None
@@ -98,8 +97,8 @@ class SystemdManager(object):
             return False
 
         try:
-            return "active" ==\
-                properties["ActiveState"].encode("utf-8")
+            state = properties["ActiveState"].encode("utf-8")
+            return state == "active"
         except KeyError:
             return False
 
@@ -120,23 +119,7 @@ class SystemdManager(object):
 
             return properties_interface.GetAll(
                 "org.freedesktop.systemd1.Unit")
+
         except dbus.exceptions.DBusException as error:
             print(error)
             return None
-
-
-
-if __name__ == "__main__":
-
-    unit_name = "bluetooth.service"
-    manager = SystemdManager()
-
-    print("stop: " + str(manager.stop_unit(unit_name)))
-    print("is active: " + str(manager.is_active(unit_name)))
-
-    print("start: " + str(manager.start_unit(unit_name)))
-    print("is active: " + str(manager.is_active(unit_name)))
-
-    print("enable: " + str(manager.enable_unit(unit_name)))
-    #print("disable: " + str(manager.disable_unit(unit_name)))
-
