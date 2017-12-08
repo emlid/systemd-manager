@@ -38,6 +38,9 @@ import dbus
 
 class SystemdManager(object):
 
+    UNIT_INTERFACE = "org.freedesktop.systemd1.Unit"
+    SERVICE_UNIT_INTERFACE = "org.freedesktop.systemd1.Service"
+
     def __init__(self):
         self.__bus = dbus.SystemBus()
 
@@ -95,6 +98,19 @@ class SystemdManager(object):
             print(error)
             return False
 
+    def _get_unit_file_state(self, unit_name):
+        interface = self._get_interface()
+
+        if interface is None:
+            return None
+
+        try:
+            state = interface.GetUnitFileState(unit_name)
+            return state
+        except dbus.exceptions.DBusException as error:
+            print(error)
+            return False
+
     def _get_interface(self):
         try:
             obj = self.__bus.get_object("org.freedesktop.systemd1",
@@ -104,19 +120,49 @@ class SystemdManager(object):
             print(error)
             return None
 
-    def is_active(self, unit_name):
-        properties = self._get_unit_properties(unit_name)
+    def get_active_state(self, unit_name):
+        properties = self._get_unit_properties(unit_name, self.UNIT_INTERFACE)
 
         if properties is None:
             return False
 
         try:
             state = properties["ActiveState"].encode("utf-8")
-            return state == "active"
+            return state
         except KeyError:
             return False
 
-    def _get_unit_properties(self, unit_name):
+    def is_active(self, unit_name):
+        unit_state = self.get_active_state(unit_name)
+        return unit_state == "active"
+
+    def is_failed(self, unit_name):
+        unit_state = self.get_active_state(unit_name)
+        return unit_state == "failed"
+
+    def get_error_code(self, unit_name):
+        service_properties = self._get_unit_properties(unit_name, self.SERVICE_UNIT_INTERFACE)
+
+        if service_properties is None:
+            return None
+
+        return self._get_exec_status(service_properties)
+
+    def _get_exec_status(self, properties):
+        try:
+            exec_status = int(properties["ExecMainStatus"])
+            return exec_status
+        except KeyError:
+            return None
+
+    def _get_result(self, properties):
+        try:
+            result = properties["Result"].encode("utf-8")
+            return result
+        except KeyError:
+            return False
+
+    def _get_unit_properties(self, unit_name, unit_interface):
         interface = self._get_interface()
 
         if interface is None:
@@ -131,9 +177,13 @@ class SystemdManager(object):
             properties_interface = dbus.Interface(
                 obj, "org.freedesktop.DBus.Properties")
 
-            return properties_interface.GetAll(
-                "org.freedesktop.systemd1.Unit")
+            return properties_interface.GetAll(unit_interface)
 
         except dbus.exceptions.DBusException as error:
             print(error)
             return None
+
+
+if __name__ == "__main__":
+    s = SystemdManager()
+    print s.get_error_code("wpa_supplicant.service")
