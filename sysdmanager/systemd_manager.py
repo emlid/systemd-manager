@@ -134,11 +134,11 @@ class SystemdManager(object):
 
     def is_active(self, unit_name):
         unit_state = self.get_active_state(unit_name)
-        return unit_state == "active"
+        return unit_state == b"active"
 
     def is_failed(self, unit_name):
         unit_state = self.get_active_state(unit_name)
-        return unit_state == "failed"
+        return unit_state == b"failed"
 
     def get_error_code(self, unit_name):
         service_properties = self._get_unit_properties(unit_name, self.SERVICE_UNIT_INTERFACE)
@@ -186,4 +186,4 @@ class SystemdManager(object):
 
 if __name__ == "__main__":
     s = SystemdManager()
-    print s.get_error_code("wpa_supplicant.service")
+    print(s.get_error_code("wpa_supplicant.service"))

@@ -1,1 +1,1 @@
-from systemd_manager import SystemdManager
+from .systemd_manager import SystemdManager
