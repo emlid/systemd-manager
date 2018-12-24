@@ -70,6 +70,19 @@ class SystemdManager(object):
             print(error)
             return False
 
+    def restart_unit(self, unit_name, mode="replace"):
+        interface = self._get_interface()
+
+        if interface is None:
+            return False
+
+        try:
+            interface.RestartUnit(unit_name, mode)
+            return True
+        except dbus.exceptions.DBusException as error:
+            print(error)
+            return False
+
     def enable_unit(self, unit_name):
         interface = self._get_interface()
 

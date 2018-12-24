@@ -32,6 +32,27 @@ class TestSystemdManager:
         active = self.sysdmanager.is_active(self.unit_name)
         assert not active
 
+    def test_restart_unit(self):
+        # Confirm that an active unit, when restarted, stays active
+        start_status = self.sysdmanager.start_unit(self.unit_name)
+        assert start_status
+
+        restart_status = self.sysdmanager.restart_unit(self.unit_name)
+        assert restart_status
+
+        active = self.sysdmanager.is_active(self.unit_name)
+        assert active
+
+        # Confirm that an inactive unit, when restarted, becomes active
+        stop_status = self.sysdmanager.stop_unit(self.unit_name)
+        assert stop_status
+
+        restart_status = self.sysdmanager.restart_unit(self.unit_name)
+        assert restart_status
+
+        active = self.sysdmanager.is_active(self.unit_name)
+        assert active
+
     def test_enable_unit(self):
         enable_status = self.sysdmanager.enable_unit(self.unit_name)
         assert enable_status
