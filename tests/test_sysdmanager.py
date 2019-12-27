@@ -1,7 +1,7 @@
 import dbus
 import pytest
 
-from sysdmanager import SystemdManager
+from reach.systemd.sysdmanager import SystemdManager
 
 
 @pytest.fixture()

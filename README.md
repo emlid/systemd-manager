@@ -11,7 +11,7 @@ The setup.py **does not contain** the `python-dbus` dependency and you have to i
 ##### Example
 
 ```
-from sysdmanager import SystemdManager
+from reach.systemd.sysdmanager import SystemdManager
 
 manager = SystemdManager()
 if not manager.is_active("bluetooth.service"):
